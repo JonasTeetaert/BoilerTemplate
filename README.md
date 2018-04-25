@@ -1,1 +1,1 @@
-# StarterTemplate
+# BoilerTemplate
