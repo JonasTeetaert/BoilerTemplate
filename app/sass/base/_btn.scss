@@ -1,0 +1,76 @@
+.btn {
+	font-weight: 900;
+	text-decoration: none;
+
+	&:hover {
+		text-shadow: 1px 1px $color-primary;
+	}
+}
+
+.btn-2 {
+	font-weight: 900;
+	text-decoration: none;
+
+	&:hover {
+		text-shadow: 1px 1px $color-secondary;
+	}
+}
+
+.btn--stroke {
+	color: transparent;
+	-webkit-text-stroke: 0.5px black;
+}
+
+.btn--firstletter {
+
+	&:first-letter {
+
+		text-shadow: 1px 1px $color-secondary;
+	}
+
+}
+
+.btn--shadow {
+	text-shadow: 1px 1px $color-secondary;
+}
+
+.toggle {
+	display: none;
+}
+
+.toggle--label {
+	display: inline-block;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	font-weight: bold;
+	margin: 0;
+
+	&:hover {
+        color: $color-secondary;
+    }
+
+	&:before {
+		position: relative;
+		content: attr(data-off);
+		opacity: 1;
+		transition: opacity $time ease-in;
+	}
+
+	&:after {
+		position: absolute;
+		left: 0;
+		top: 0;
+		content: attr(data-on);
+		opacity: 0;
+		transition: opacity $time ease-out;
+	}
+}
+
+.toggle:checked ~ .toggle--label:before {
+	opacity: 0;
+}
+
+.toggle:checked ~ .toggle--label:after {
+	opacity: 1;
+}

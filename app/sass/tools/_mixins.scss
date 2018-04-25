@@ -1,0 +1,33 @@
+// mixins
+$fix-mqW: false !default;
+$fix-mqH: false !default;
+@mixin respond-min-width($width) {
+	@if $fix-mqW {
+		@if $fix-mqW>=$width {
+			body:after {
+				content:"#{$width}";
+			}
+			@content;
+		}
+	}
+	@else {
+		@media screen and (min-width: $width) {
+			body:after {
+				content:"#{$width}";
+			}
+			@content;
+		}
+	}
+}
+
+@function globalPerc($text-size) {
+	$global: percentage((100 / 16) * $text-size) / 100;
+	@return $global;
+}
+
+@function rem($pxval) {
+	@if (unitless($pxval)) {
+		$pxval: $pxval * 1px;
+	}
+	@return $pxval / 16 * 1em;
+}

@@ -1,0 +1,42 @@
+// content-box
+.section {
+    position: relative;
+}
+
+.content-box {
+    padding: $gutter/2;
+}
+
+.section__inner {
+    width: 100%;
+    padding: $gutter/2;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: $view-small-devices;
+    position: relative;
+}
+
+.section__inner--about {
+    margin-top: 45px;
+    margin-bottom: 40px;
+}
+
+.section__inner--hp {
+    padding: $gutter/2 $gutter;
+}
+
+.horizontal-gutter {
+    padding: $gutter/2 $gutter;
+}
+
+@media screen and (min-width: $view-medium-devices) {
+    .section__inner {
+        max-width: $view-medium-devices;
+    }
+}
+
+@media screen and (min-width: $view-large-devices) {
+    .section__inner {
+        max-width: $max-witdh;
+    }
+}

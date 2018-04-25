@@ -1,0 +1,49 @@
+// ========================================================
+// GRID
+// ========================================================
+[class*='grid--col'] {
+    display: flex;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+[class*='grid--col']>* {
+    margin: 0;
+    width: 100%;
+}
+
+.grid--col-max-3>*,
+.grid--col-max-4>* {
+    max-width: 100%;
+    flex-basis: 100%;
+}
+
+.grid--col-max-2>* {
+    max-width: 50%;
+    flex-basis: 50%;
+}
+
+// ========================================================
+// TABLET
+// ========================================================
+@include respond-min-width($view-medium-devices) {
+    .grid--col-max-3>*,
+    .grid--col-max-4>* {
+        max-width: 50%;
+        flex-basis: 50%;
+    }
+}
+
+// ========================================================
+// DESKTOP
+// ========================================================
+@include respond-min-width($view-large-devices) {
+    .grid--col-max-3>* {
+        max-width: 33.333%;
+        flex-basis: 33.333%;
+    }
+    .grid--col-max-4>* {
+        max-width: 25%;
+        flex-basis: 25%;
+    }
+}

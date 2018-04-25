@@ -1,0 +1,219 @@
+// ========================================================
+// HTML and Body
+// ========================================================
+html,
+button,
+datalist,
+input,
+select,
+textarea {
+    color: $color-text;
+}
+
+html {
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.5;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+* {
+    box-sizing: inherit;
+    &:before,
+    &:after {
+        box-sizing: inherit;
+    }
+}
+
+body {
+    font-family: $font-primary;
+    font-size: globalPerc($text-size);
+    &:after {
+        content: "0em";
+        display: block;
+        height: 0;
+        position: absolute;
+        overflow: hidden;
+        width: 0;
+    }
+}
+
+// ========================================================
+// Headers
+// ========================================================
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    margin: 0 0 ($gutter/2) 0;
+    line-height: 1.1;
+}
+
+h1,
+.title-primary {
+    font-family: $font-primary;
+    font-size: 2.1em;
+    font-weight: 900;
+}
+
+h2,
+.title-secondary {
+    font-family: $font-primary;
+    font-size: 1.9em;
+    font-weight: 900;
+}
+
+h3,
+.title-tertiary {
+    font-family: $font-primary;
+    font-size: 1.5em;
+    font-weight: 500;
+}
+
+h4 {
+    font-family: $font-primary;
+    font-size: 1.3em;
+    font-weight: 900;
+}
+
+// ========================================================
+// Default spacings
+// ========================================================
+p,
+img,
+table,
+form,
+fieldset,
+.text-label,
+pre {
+    &:first-child {
+        margin-top: 0;
+    }
+    &:only-child {
+        margin-bottom: 0;
+    }
+}
+
+h2+p,
+h3+p,
+h2+ol,
+h3+ol,
+h2+ul,
+h3+ul {
+    margin-top: 0;
+}
+
+p,
+ol,
+ul,
+table,
+form,
+fieldset,
+pre,
+object,
+embed,
+video,
+audio,
+figure,
+figcaption,
+.paragraph {
+    margin-top: $gutter/2;
+    &:last-of-type {
+        margin-bottom: 0;
+    }
+}
+
+p {
+    &:last-of-type {
+        margin-top: $gutter/2;
+    }
+    &:only-child {
+        margin: 0;
+    }
+}
+
+p,
+ol,
+ul,
+blockquote,
+img,
+table,
+form,
+fieldset,
+pre,
+object,
+embed,
+video,
+audio,
+figure,
+figcaption,
+.paragraph {
+    margin-bottom: $gutter/2;
+}
+
+ol,
+ul {
+    padding-left: $gutter;
+}
+
+ol ol,
+ul ul {
+    padding-left: $gutter;
+}
+
+li {
+    margin-bottom: $gutter/2;
+    margin-top: $gutter/2;
+}
+
+datalist,
+input,
+select,
+textarea {
+    padding: $gutter/2 $gutter;
+    background-color: transparent;
+    color: inherit;
+    &:focus,
+    &:active {
+        color: inherit;
+    }
+}
+
+// ========================================================
+// Links and buttons
+// ========================================================
+a,
+p a {
+    color: $color-primary;
+    text-decoration: underline;
+    position: relative;
+    transition: $time-fast ease-in-out;
+    &:hover {
+        color: $color-secondary;
+    }
+}
+
+a {
+    text-decoration: none;
+    display: inline-block;
+}
+
+@media screen and (min-width: $view-large-devices) {
+    h1,
+    .title-primary {
+        font-size: 4.1em;
+    }
+    h2,
+    .title-secondary {
+        font-size: 2.5em;
+    }
+    h3,
+    .title-tertiary {
+        font-size: 1.9em;
+    }
+}

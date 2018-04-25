@@ -1,0 +1,29 @@
+// ========================================================
+// MAIN
+// ITCSS Architecture ( @see http://cssguidelin.es )
+// ========================================================
+// Settings - Globally-available variables and config.
+// ========================================================
+@import "settings/fonts";
+@import "settings/global";
+// ========================================================
+// TOOLS - Default mixins and functions (Globally, Public mixins, Helper functions)
+// ========================================================
+@import "tools/helpers";
+@import "tools/mixins";
+// ========================================================
+// base - Unclassed HTML base (Type selectors)
+// ========================================================
+@import "base/all";
+// ========================================================
+// OBJECTS - OOCSS, DESIGN PATTERNS, Agnostically named (e.g. .ui-list {}, .ui-item {} )
+// ========================================================
+@import "objects/all";
+// ========================================================
+// COMPONENTS - Designed components, chucks of UI (More explicityly named (.product-list, .gallery-list))
+// ========================================================
+@import "components/all";
+// ========================================================
+// COMPOSITIONS - Combining parts of 'components' to form a whole
+// ========================================================
+@import "compositions/all";

@@ -1,0 +1,19 @@
+// Colors
+$color-primary: #000000;
+$color-secondary: #FFBC27;
+$color-text: #000000;
+// Global font-size 16px
+$text-size: 16;
+// Global margins 20px
+$gutter: 1.25rem;
+// Animation
+$time-fast: .2s;
+$time: .4s;
+$time-slow: .6s;
+// Views for media queries
+$view-small-devices: 36rem; // 576px (landscape phones, 576px and up)
+$view-medium-devices: 48rem; // 768px (tablets, 768px and up)
+$view-large-devices: 62rem; // 992px (desktops, 992px and up)
+$view-extra-large-devices: 75rem; // 1200px (large desktops, 1200px and up)
+$min-width: 20rem;
+$max-witdh: 60rem; //960px
