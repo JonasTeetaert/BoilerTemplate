@@ -12,7 +12,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 var rimraf = require('rimraf');
 var sassdoc = require('sassdoc');
-var sassdoc = require('require-dir');
+var sassdir = require('require-dir');
 var browserSync = require('browser-sync');
 var sequence = require('run-sequence');
 var php = require('gulp-connect-php');
@@ -22,7 +22,7 @@ var babel = require("gulp-babel");
 // =============================================================================
 // Server URL
 // =============================================================================
-var dynamicServerURL = 'http://raakpunt.dev';
+var dynamicServerURL = 'http://boilertemplate.dev';
 
 // =============================================================================
 // Use `spawn` to execute shell command using Node
