@@ -84,7 +84,6 @@ gulp.task('compile-sass:local', function () {
         .pipe(cssnano())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(buildPath + '/css'));
-    //.pipe(browserSync.reload({ stream: true }));
 });
 
 // Whithout sourcemaps
@@ -100,9 +99,15 @@ gulp.task('compile-sass:release', function () {
         .pipe(autoprefixer())
         .pipe(cssnano())
         .pipe(gulp.dest(buildPath + '/css'));
-    //.pipe(browserSync.reload({ stream: true }));
 });
 
+gulp.task('bundle-css', function () {
+    return gulp
+        .src(paths.css.bootstrap)
+        .pipe(concat('css-bundles.css'))
+        .pipe(cssnano())
+        .pipe(gulp.dest(buildPath + '/css'));
+});
 
 // =============================================================================
 // Combine JavaScript into one file
@@ -110,30 +115,32 @@ gulp.task('compile-sass:release', function () {
 // =============================================================================
 gulp.task('compile-js:local', function () {
     return gulp
-        .src([
-            paths.js.jquery,
-            paths.js.popperjs,
-            paths.js.bootstrap,
-            srcPath + '/js/**/*.js'])
+        .src(srcPath + '/js/**/*.js')
         .pipe(sourcemaps.init())
         .pipe(babel())
         .pipe(concat('main.js'))
+        .pipe(uglify())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(buildPath + '/js'));
 });
 
-// Without sourcemaps, with uglifier
+// Without sourcemaps
 gulp.task('compile-js:release', function () {
+    return gulp
+        .src(srcPath + '/js/**/*.js')
+        .pipe(babel())
+        .pipe(concat('main.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest(buildPath + '/js'));
+});
+
+gulp.task('bundle-js', function () {
     return gulp
         .src([
             paths.js.jquery,
             paths.js.popperjs,
-            paths.js.bootstrap,
-            srcPath + '/js/**/*.js'])
-        .pipe(babel())
-        .pipe(concat('main.js'))
-        .pipe(gulp.dest(buildPath + '/js'))
-        .pipe(rename('main.min.js'))
+            paths.js.bootstrap])
+        .pipe(concat('js-bundles.js'))
         .pipe(uglify())
         .pipe(gulp.dest(buildPath + '/js'));
 });
@@ -189,7 +196,9 @@ gulp.task('copy-json', function () {
 gulp.task('build:local', function (done) {
     sequence('clean', [
         'php',
+        'bundle-css',
         'compile-sass:local',
+        'bundle-js',
         'compile-js:local',
         'copy-images:local',
         'copy-fonts',
@@ -201,7 +210,9 @@ gulp.task('build:local', function (done) {
 gulp.task('build:release', function (done) {
     sequence('clean', [
         'php',
+        'bundle-css',
         'compile-sass:release',
+        'bundle-js',
         'compile-js:release',
         'copy-images:release',
         'copy-fonts',
@@ -215,7 +226,7 @@ gulp.task('build:release', function (done) {
 // Start a server with LiveReload to preview the site in
 // =============================================================================
 // http://localhost:3000/buildPath/index.php
-gulp.task('connect-sync', function () {
+/*gulp.task('connect-sync', function () {
     connect.server({}, function () {
         browserSync({
             proxy: '127.0.0.1:8000',
@@ -223,9 +234,9 @@ gulp.task('connect-sync', function () {
         });
     });
 
-});
+});*/
 
-gulp.task('connect-php', function(){
+gulp.task('connect-php', function () {
     connect.server({
         base: buildPath,
         port: PORT,
@@ -233,12 +244,12 @@ gulp.task('connect-php', function(){
     });
 });
 
-gulp.task('browser-sync', ['connect-php'], function() {
+gulp.task('browser-sync', ['connect-php'], function () {
     browserSync({
         proxy: '127.0.0.1:' + PORT,
         port: PORT,
         open: true,
-        notify: false
+        notify: true
     });
 });
 

@@ -98,8 +98,8 @@
 			</div>
 		</div>
 	</section>
-
-	<script type="text/javascript" src="js/main.js"></script>
+	<!-- scripts -->
+	<?php include 'inc/scripts.php' ?>
 </body>
 
 </html>
