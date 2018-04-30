@@ -45,6 +45,7 @@ var COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
 
 var srcPath = 'app';
 var buildPath = '_dist';
+var paths = require('./paths.json');
 
 
 // =============================================================================
@@ -71,8 +72,11 @@ gulp.task('php', function () {
 // =============================================================================
 gulp.task('compile-sass:local', function () {
     return gulp
-        .src(srcPath + '/sass/main.scss')
+        .src([
+            paths.css.bootstrap,
+            srcPath + '/sass/main.scss'])
         .pipe(sourcemaps.init())
+        .pipe(concat('main.scss'))
         .pipe(sass()).on('error', notify.onError(function (error) {
             return "Problem file : " + error.message;
         }))
@@ -86,7 +90,10 @@ gulp.task('compile-sass:local', function () {
 // Whithout sourcemaps
 gulp.task('compile-sass:release', function () {
     return gulp
-        .src(srcPath + '/sass/main.scss')
+        .src([
+            paths.css.bootstrap,
+            srcPath + '/sass/main.scss'])
+        .pipe(concat('main.scss'))
         .pipe(sass()).on('error', notify.onError(function (error) {
             return "Problem file : " + error.message;
         }))
@@ -103,7 +110,11 @@ gulp.task('compile-sass:release', function () {
 // =============================================================================
 gulp.task('compile-js:local', function () {
     return gulp
-        .src(srcPath + '/js/**/*.js')
+        .src([
+            paths.js.jquery,
+            paths.js.popperjs,
+            paths.js.bootstrap,
+            srcPath + '/js/**/*.js'])
         .pipe(sourcemaps.init())
         .pipe(babel())
         .pipe(concat('main.js'))
@@ -114,7 +125,11 @@ gulp.task('compile-js:local', function () {
 // Without sourcemaps, with uglifier
 gulp.task('compile-js:release', function () {
     return gulp
-        .src(srcPath + '/js/**/*.js')
+        .src([
+            paths.js.jquery,
+            paths.js.popperjs,
+            paths.js.bootstrap,
+            srcPath + '/js/**/*.js'])
         .pipe(babel())
         .pipe(concat('main.js'))
         .pipe(gulp.dest(buildPath + '/js'))
