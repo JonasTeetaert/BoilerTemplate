@@ -34,7 +34,7 @@ var dynamicServerURL = 'http://boilertemplate.dev';
 // Port to use for the development server.
 // Browsers to target when prefixing CSS.
 // =============================================================================
-var PORT = 8010;
+var PORT = 8080;
 var UI_PORT = 3010;
 var COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
 
@@ -249,7 +249,8 @@ gulp.task('browser-sync', ['connect-php'], function () {
         proxy: '127.0.0.1:' + PORT,
         port: PORT,
         open: true,
-        notify: true
+        notify: true,
+        startPath: 'index.php'
     });
 });
 
