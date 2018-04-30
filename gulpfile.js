@@ -13,7 +13,7 @@ var autoprefixer = require('gulp-autoprefixer');
 var rimraf = require('rimraf');
 var sassdoc = require('sassdoc');
 var sassdir = require('require-dir');
-var browserSync = require('browser-sync');
+var browserSync = require('browser-sync').create();
 var sequence = require('run-sequence');
 var connect = require('gulp-connect-php');
 var babel = require("gulp-babel");
@@ -58,10 +58,10 @@ gulp.task('clean', function (done) {
 
 
 // =============================================================================
-// Copy PHP
+// Copy HTML
 // =============================================================================
-gulp.task('php', function () {
-    gulp.src(srcPath + '/**/*.php')
+gulp.task('html', function () {
+    gulp.src(srcPath + '/**/*.html')
         .pipe(gulp.dest(buildPath));
 });
 
@@ -195,7 +195,7 @@ gulp.task('copy-json', function () {
 // =============================================================================
 gulp.task('build:local', function (done) {
     sequence('clean', [
-        'php',
+        'html',
         'bundle-css',
         'compile-sass:local',
         'bundle-js',
@@ -209,7 +209,7 @@ gulp.task('build:local', function (done) {
 
 gulp.task('build:release', function (done) {
     sequence('clean', [
-        'php',
+        'html',
         'bundle-css',
         'compile-sass:release',
         'bundle-js',
@@ -226,30 +226,23 @@ gulp.task('build:release', function (done) {
 // Start a server with LiveReload to preview the site in
 // =============================================================================
 // http://localhost:3000/buildPath/index.php
-/*gulp.task('connect-sync', function () {
-    connect.server({}, function () {
-        browserSync({
-            proxy: '127.0.0.1:8000',
-            startPath: "/" + buildPath + '/index.php'
-        });
-    });
 
-});*/
-
-gulp.task('connect-php', function () {
-    connect.server({
-        base: buildPath,
-        port: PORT,
-        keepalive: true
-    });
-});
-
-gulp.task('browser-sync', ['connect-php'], function () {
+/*gulp.task('browser-sync', function () {
     browserSync({
         proxy: '127.0.0.1:' + PORT,
         port: PORT,
         open: true,
         notify: true
+    });
+});*/
+
+gulp.task('browser-sync', function() {
+    browserSync.init({
+        server: {
+            baseDir: buildPath
+        },
+        notify: true,
+        online: true
     });
 });
 
@@ -257,7 +250,7 @@ gulp.task('browser-sync', ['connect-php'], function () {
 // Build the site, run the server, and watch for file changes
 // =============================================================================
 gulp.task('default', ['build:local', 'browser-sync'], function () {
-    gulp.watch([srcPath + '/**/*.php'], ['php', browserSync.reload]);
+    gulp.watch([srcPath + '/**/*.html'], ['html', browserSync.reload]);
     gulp.watch([srcPath + '/sass/**/*.scss'], ['compile-sass:local', browserSync.reload]);
     gulp.watch([srcPath + '/js/**/*.js'], ['compile-js:local', browserSync.reload]);
     gulp.watch([srcPath + '/assets/fonts/**/*'], ['copy-fonts', browserSync.reload]);
