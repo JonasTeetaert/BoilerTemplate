@@ -34,7 +34,7 @@ var dynamicServerURL = 'http://boilertemplate.dev';
 // Port to use for the development server.
 // Browsers to target when prefixing CSS.
 // =============================================================================
-var PORT = 3000;
+var PORT = 8010;
 var UI_PORT = 3010;
 var COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
 
@@ -210,11 +210,27 @@ gulp.task('connect-sync', function () {
 
 });
 
+gulp.task('connect-php', function(){
+    connect.server({
+        base: buildPath,
+        port: PORT,
+        keepalive: true
+    });
+});
+
+gulp.task('browser-sync', ['connect-php'], function() {
+    browserSync({
+        proxy: '127.0.0.1:' + PORT,
+        port: PORT,
+        open: true,
+        notify: false
+    });
+});
 
 // =============================================================================
 // Build the site, run the server, and watch for file changes
 // =============================================================================
-gulp.task('default', ['build:local', 'connect-sync'], function () {
+gulp.task('default', ['build:local', 'browser-sync'], function () {
     gulp.watch([srcPath + '/**/*.php'], ['php', browserSync.reload]);
     gulp.watch([srcPath + '/sass/**/*.scss'], ['compile-sass:local', browserSync.reload]);
     gulp.watch([srcPath + '/js/**/*.js'], ['compile-js:local', browserSync.reload]);
