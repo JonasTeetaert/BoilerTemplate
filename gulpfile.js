@@ -3,23 +3,24 @@
 // =============================================================================
 var $ = require('gulp-load-plugins')();
 var gulp = require('gulp');
-var gutil = require('gulp-util');
 var sass = require('gulp-sass');
+var sassGlob = require('gulp-sass-glob');
 var concat = require('gulp-concat');
 var notify = require('gulp-notify');
 var cssnano = require('gulp-cssnano');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 var rimraf = require('rimraf');
-var sassdoc = require('sassdoc');
-var sassdir = require('require-dir');
 var browserSync = require('browser-sync').create();
 var sequence = require('run-sequence');
 var connect = require('gulp-connect-php');
+var imagemin = require('gulp-imagemin');
 var babel = require("gulp-babel");
 var uglify = require("gulp-uglify");
-var rename = require('gulp-rename');
-var imagemin = require('gulp-imagemin');
+var browserify = require('browserify');
+var babelify = require('babelify');
+var source  = require('vinyl-source-stream');
+var buffer  = require('vinyl-buffer');
 
 // =============================================================================
 // Server URL
@@ -77,6 +78,7 @@ gulp.task('compile-sass:local', function () {
             srcPath + '/sass/main.scss'])
         .pipe(sourcemaps.init())
         .pipe(concat('main.scss'))
+        .pipe(sassGlob())
         .pipe(sass()).on('error', notify.onError(function (error) {
             return "Problem file : " + error.message;
         }))
@@ -113,15 +115,28 @@ gulp.task('bundle-css', function () {
 // Combine JavaScript into one file
 // In production, the file is minified
 // =============================================================================
+// using browserify
+gulp.task('bundle-js', function() {
+    return browserify({entries: srcPath +'/js/index.js', debug: true})
+    .transform(babelify)
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init())
+    .pipe(uglify())
+    .pipe(sourcemaps.write('./maps'))
+    .pipe(gulp.dest(buildPath + '/js'));
+}); 
+
 gulp.task('compile-js:local', function () {
     return gulp
         .src(srcPath + '/js/**/*.js')
         .pipe(sourcemaps.init())
         .pipe(babel())
-        .pipe(concat('main.js'))
+        .pipe(concat('index.js'))
         .pipe(uglify())
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest(buildPath + '/js'));
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(buildPath + '/js/bundle.js'));
 });
 
 // Without sourcemaps
@@ -134,16 +149,16 @@ gulp.task('compile-js:release', function () {
         .pipe(gulp.dest(buildPath + '/js'));
 });
 
-gulp.task('bundle-js', function () {
-    return gulp
-        .src([
-            paths.js.jquery,
-            paths.js.popperjs,
-            paths.js.bootstrap])
-        .pipe(concat('js-bundles.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(buildPath + '/js'));
-});
+// gulp.task('bundle-js', function () {
+//     return gulp
+//         .src([
+//             paths.js.jquery,
+//             paths.js.popperjs,
+//             paths.js.bootstrap])
+//         .pipe(concat('js-bundles.js'))
+//         .pipe(uglify())
+//         .pipe(gulp.dest(buildPath + '/js'));
+// });
 
 // =============================================================================
 // Copy images to the buildPath folder
@@ -199,7 +214,7 @@ gulp.task('build:local', function (done) {
         'bundle-css',
         'compile-sass:local',
         'bundle-js',
-        'compile-js:local',
+        // 'compile-js:local',
         'copy-images:local',
         'copy-fonts',
         'copy-icons'
@@ -252,7 +267,7 @@ gulp.task('browser-sync', function() {
 gulp.task('default', ['build:local', 'browser-sync'], function () {
     gulp.watch([srcPath + '/**/*.html'], ['html', browserSync.reload]);
     gulp.watch([srcPath + '/sass/**/*.scss'], ['compile-sass:local', browserSync.reload]);
-    gulp.watch([srcPath + '/js/**/*.js'], ['compile-js:local', browserSync.reload]);
+    gulp.watch([srcPath + '/js/**/*.js'], ['bundle-js', browserSync.reload]);
     gulp.watch([srcPath + '/assets/fonts/**/*'], ['copy-fonts', browserSync.reload]);
     gulp.watch([srcPath + '/assets/icons/**/*'], ['copy-icons', browserSync.reload]);
     gulp.watch([srcPath + '/assets/images/**/*'], ['copy-images', browserSync.reload]);
