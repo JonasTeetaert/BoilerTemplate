@@ -30,6 +30,8 @@ html {
 body {
     font-family: $font-primary;
     font-size: globalPerc($text-size);
+    background: $blue;
+    color: $light;
     &:after {
         content: "0em";
         display: block;
@@ -124,7 +126,7 @@ figcaption,
 .paragraph {
     margin-top: $gutter/2;
     &:last-of-type {
-        margin-bottom: 0;
+        // margin-bottom: 0;
     }
 }
 
