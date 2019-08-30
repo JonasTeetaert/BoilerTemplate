@@ -20,8 +20,8 @@ var babel = require("gulp-babel");
 var uglify = require("gulp-uglify");
 var browserify = require('browserify');
 var babelify = require('babelify');
-var source  = require('vinyl-source-stream');
-var buffer  = require('vinyl-buffer');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
 
 // =============================================================================
 // Server URL
@@ -73,7 +73,7 @@ gulp.task('html', function () {
 // =============================================================================
 gulp.task('compile-sass:local', function () {
     return gulp
-        .src(srcPath + '/sass/main.scss')
+        .src(srcPath + '/styles/main.scss')
         .pipe(sourcemaps.init())
         .pipe(concat('main.scss'))
         .pipe(sassGlob())
@@ -87,10 +87,10 @@ gulp.task('compile-sass:local', function () {
         .pipe(gulp.dest(buildPath + '/css'));
 });
 
-// Without sourcemaps
+// Without sourcemaps and minified
 gulp.task('compile-sass:release', function () {
     return gulp
-        .src(srcPath + '/sass/main.scss')
+        .src(srcPath + '/styles/main.scss')
         .pipe(concat('main.scss'))
         .pipe(sassGlob())
         .pipe(sass())
@@ -106,9 +106,9 @@ gulp.task('compile-sass:release', function () {
 // Combine JavaScript into one file using browserify
 // In production, the file is minified
 // =============================================================================
-gulp.task('bundle-js:local', function() {
+gulp.task('bundle-js:local', function () {
     return browserify({
-        entries: srcPath +'/js/index.js', 
+        entries: srcPath + '/js/index.js',
         debug: true
     })
         .transform(babelify)
@@ -119,64 +119,40 @@ gulp.task('bundle-js:local', function() {
         })
         .pipe(source('bundle.js'))
         .pipe(buffer())
-        .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(sourcemaps.init({ loadMaps: true }))
         .pipe(sourcemaps.write('./maps'))
         .pipe(gulp.dest(buildPath + '/js'));
-}); 
+});
 
-// without sourcemaps
-gulp.task('bundle-js:release', function() {
-    return browserify({entries: srcPath +'/js/index.js', debug: true})
-    .transform(babelify)
-    .bundle()
-    .pipe(source('bundle.min.js'))
-    .pipe(buffer())
-    .pipe(uglify())
-    .pipe(gulp.dest(buildPath + '/js'));
+// without sourcemaps and minified
+gulp.task('bundle-js:release', function () {
+    return browserify({ entries: srcPath + '/js/index.js', debug: true })
+        .transform(babelify)
+        .bundle()
+        .pipe(source('bundle.min.js'))
+        .pipe(buffer())
+        .pipe(uglify())
+        .pipe(gulp.dest(buildPath + '/js'));
 });
 
 // =============================================================================
-// Copy images to the buildPath folder
+// Copy assets to the buildPath folder
+// =============================================================================
+gulp.task('copy-assets', function () {
+    return gulp
+        .src(srcPath + '/assets/**/*')
+        .pipe(gulp.dest(buildPath + '/assets'));
+});
+
+// =============================================================================
+// Copy and minifies images to the buildPath folder
 // In production, the images are compressed
 // =============================================================================
-gulp.task('copy-images:local', function () {
-    return gulp
-        .src(srcPath + '/assets/images/**/*')
-        .pipe(gulp.dest(buildPath + '/assets/images'));
-});
-
-gulp.task('copy-images:release', function () {
+gulp.task('minify-images', function () {
     return gulp
         .src(srcPath + '/assets/images/**/*')
         .pipe(imagemin())
         .pipe(gulp.dest(buildPath + '/assets/images'));
-});
-
-// =============================================================================
-// Copy src fonts to the buildPath folder
-// =============================================================================
-gulp.task('copy-fonts', function () {
-    return gulp
-        .src(srcPath + '/assets/fonts/**/*.*')
-        .pipe(gulp.dest(buildPath + '/assets/fonts'));
-});
-
-// =============================================================================
-// Copy icons fonts to the buildPath folder
-// =============================================================================
-gulp.task('copy-icons', function () {
-    return gulp
-        .src(srcPath + '/assets/icons/**/*.*')
-        .pipe(gulp.dest(buildPath + '/assets/icons'));
-});
-
-// =============================================================================
-// Copy src JSON to the buildPath folder
-// =============================================================================
-gulp.task('copy-json', function () {
-    return gulp
-        .src(srcPath + '/assets/json/**/*.json')
-        .pipe(gulp.dest(buildPath + '/assets/json'));
 });
 
 
@@ -188,10 +164,7 @@ gulp.task('build:local', function (done) {
         'html',
         'compile-sass:local',
         'bundle-js:local',
-        'copy-images:local',
-        'copy-fonts',
-        'copy-icons'
-        //'copy-json'
+        'copy-assets',
     ], done);
 });
 
@@ -200,10 +173,8 @@ gulp.task('build:release', function (done) {
         'html',
         'compile-sass:release',
         'bundle-js:release',
-        'copy-images:release',
-        'copy-fonts',
-        'copy-icons'
-        //'copy-json'
+        'copy-assets',
+        'minify-images',
     ], done);
 });
 
@@ -211,7 +182,7 @@ gulp.task('build:release', function (done) {
 // =============================================================================
 // Start a server with LiveReload to preview the site in
 // =============================================================================
-gulp.task('browser-sync', function() {
+gulp.task('browser-sync', function () {
     browserSync.init({
         server: {
             baseDir: buildPath
@@ -226,9 +197,7 @@ gulp.task('browser-sync', function() {
 // =============================================================================
 gulp.task('default', ['build:local', 'browser-sync'], function () {
     gulp.watch([srcPath + '/**/*.html'], ['html', browserSync.reload]);
-    gulp.watch([srcPath + '/sass/**/*.scss'], ['compile-sass:local', browserSync.reload]);
+    gulp.watch([srcPath + '/styles/**/*.scss'], ['compile-sass:local', browserSync.reload]);
     gulp.watch([srcPath + '/js/**/*.js'], ['bundle-js:local', browserSync.reload]);
-    gulp.watch([srcPath + '/assets/fonts/**/*'], ['copy-fonts', browserSync.reload]);
-    gulp.watch([srcPath + '/assets/icons/**/*'], ['copy-icons', browserSync.reload]);
-    gulp.watch([srcPath + '/assets/images/**/*'], ['copy-images:local', browserSync.reload]);
+    gulp.watch([srcPath + '/assets/**/*'], ['copy-assets', browserSync.reload]);
 });

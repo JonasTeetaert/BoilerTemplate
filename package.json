@@ -20,6 +20,10 @@
     "url": "https://github.com/JonasTeetaert/BoilerTemplate.git"
   },
   "license": "MIT",
+  "scripts": {
+    "dev": "gulp",
+    "build": "gulp build:release"
+  },
   "dependencies": {
     "animejs": "^3.0.1",
     "bootstrap": "^4.1.0",
