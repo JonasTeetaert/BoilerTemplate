@@ -129,7 +129,7 @@ gulp.task('bundle-js:release', function () {
     return browserify({ entries: srcPath + '/js/index.js', debug: true })
         .transform(babelify)
         .bundle()
-        .pipe(source('bundle.min.js'))
+        .pipe(source('bundle.js'))
         .pipe(buffer())
         .pipe(uglify())
         .pipe(gulp.dest(buildPath + '/js'));
