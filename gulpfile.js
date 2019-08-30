@@ -7,6 +7,7 @@ var sass = require('gulp-sass');
 var sassGlob = require('gulp-sass-glob');
 var concat = require('gulp-concat');
 var notify = require('gulp-notify');
+var gutil = require('gulp-util');
 var cssnano = require('gulp-cssnano');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
@@ -76,7 +77,8 @@ gulp.task('compile-sass:local', function () {
         .pipe(sourcemaps.init())
         .pipe(concat('main.scss'))
         .pipe(sassGlob())
-        .pipe(sass()).on('error', notify.onError(function (error) {
+        .pipe(sass())
+        .on('error', notify.onError(function (error) {
             return "Problem file : " + error.message;
         }))
         .pipe(autoprefixer())
@@ -90,7 +92,9 @@ gulp.task('compile-sass:release', function () {
     return gulp
         .src(srcPath + '/sass/main.scss')
         .pipe(concat('main.scss'))
-        .pipe(sass()).on('error', notify.onError(function (error) {
+        .pipe(sassGlob())
+        .pipe(sass())
+        .on('error', notify.onError(function (error) {
             return "Problem file : " + error.message;
         }))
         .pipe(autoprefixer())
@@ -103,15 +107,21 @@ gulp.task('compile-sass:release', function () {
 // In production, the file is minified
 // =============================================================================
 gulp.task('bundle-js:local', function() {
-    return browserify({entries: srcPath +'/js/index.js', debug: true})
-    .transform(babelify)
-    .bundle()
-    .pipe(source('bundle.min.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init())
-    .pipe(uglify())
-    .pipe(sourcemaps.write('./maps'))
-    .pipe(gulp.dest(buildPath + '/js'));
+    return browserify({
+        entries: srcPath +'/js/index.js', 
+        debug: true
+    })
+        .transform(babelify)
+        .bundle()
+        .on('error', function (err) {
+            gutil.log(err);
+            this.emit('end');
+        })
+        .pipe(source('bundle.js'))
+        .pipe(buffer())
+        .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(sourcemaps.write('./maps'))
+        .pipe(gulp.dest(buildPath + '/js'));
 }); 
 
 // without sourcemaps
@@ -190,7 +200,6 @@ gulp.task('build:release', function (done) {
         'html',
         'compile-sass:release',
         'bundle-js:release',
-        'compile-js:release',
         'copy-images:release',
         'copy-fonts',
         'copy-icons'
