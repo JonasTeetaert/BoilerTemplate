@@ -12,7 +12,7 @@ var cssnano = require('gulp-cssnano');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 var rimraf = require('rimraf');
-var browserSync = require('browser-sync');
+var browserSync = require('browser-sync').create();
 var sequence = require('run-sequence');
 var connect = require('gulp-connect-php');
 var imagemin = require('gulp-imagemin');
@@ -185,42 +185,20 @@ gulp.task('build:release', function (done) {
 // =============================================================================
 // Start a server with LiveReload to preview the site in
 // =============================================================================
-// http://localhost:3000/buildPath/index.php
-/*gulp.task('connect-sync', function () {
-    connect.server({}, function () {
-        browserSync({
-            proxy: '127.0.0.1:8000',
-            startPath: "/" + buildPath + '/index.php'
-        });
+gulp.task('connect-php', function () {
+    connect.server({
+        base: buildPath,
+        port: PORT,
+        keepalive: true
     });
+});
 
-});*/
-
-// gulp.task('connect-php', function () {
-//     connect.server({
-//         base: buildPath,
-//         port: PORT,
-//         keepalive: true
-//     });
-// });
-
-// gulp.task('browser-sync', ['connect-php'], function () {
-//     browserSync.init({
-//         server: {
-//             baseDir: buildPath,
-//         },
-//         port: PORT,
-//         notify: true,
-//         online: true
-//     });
-// });
-
-gulp.task('connect-sync', function () {
-    connect.server({}, function () {
-        browserSync({
-            proxy: '127.0.0.1:8000',
-            startPath: "/" + buildPath + '/index.php',
-        });
+gulp.task('browserSync', ['connect-php'], function () {
+    browserSync.init({
+        proxy: "127.0.0.1:" + PORT,
+        baseDir: buildPath,
+        open: true,
+        notify: false
     });
 });
 
@@ -228,7 +206,7 @@ gulp.task('connect-sync', function () {
 // =============================================================================
 // Build the site, run the server, and watch for file changes
 // =============================================================================
-gulp.task('default', ['build:local', 'connect-sync'], function () {
+gulp.task('default', ['build:local', 'browserSync'], function () {
     gulp.watch([srcPath + '/**/*.php'], ['php', browserSync.reload]);
     gulp.watch([srcPath + '/styles/**/*.scss'], ['compile-sass:local', browserSync.reload]);
     gulp.watch([srcPath + '/js/**/*.js'], ['bundle-js:local', browserSync.reload]);
