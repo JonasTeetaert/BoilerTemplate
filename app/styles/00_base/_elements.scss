@@ -21,6 +21,7 @@ html {
 
 * {
     box-sizing: inherit;
+
     &:before,
     &:after {
         box-sizing: inherit;
@@ -29,7 +30,10 @@ html {
 
 body {
     font-family: $font-primary;
-    font-size: globalPerc($text-size);
+    font-size: $text-size;
+    background: $gray;
+    color: $purple;
+
     &:after {
         content: "0em";
         display: block;
@@ -94,6 +98,7 @@ pre {
     &:first-child {
         margin-top: 0;
     }
+
     &:only-child {
         margin-bottom: 0;
     }
@@ -123,8 +128,9 @@ figure,
 figcaption,
 .paragraph {
     margin-top: $gutter/2;
+
     &:last-of-type {
-        margin-bottom: 0;
+        // margin-bottom: 0;
     }
 }
 
@@ -132,6 +138,7 @@ p {
     &:last-of-type {
         margin-top: $gutter/2;
     }
+
     &:only-child {
         margin: 0;
     }
@@ -178,6 +185,7 @@ textarea {
     padding: $gutter/2 $gutter;
     background-color: transparent;
     color: inherit;
+
     &:focus,
     &:active {
         color: inherit;
@@ -187,14 +195,14 @@ textarea {
 // ========================================================
 // Links and buttons
 // ========================================================
-a,
 p a {
-    color: $color-primary;
+    color: $red;
     text-decoration: underline;
     position: relative;
-    transition: $time-fast ease-in-out;
+
+    // transition: $time-fast ease-in-out;
     &:hover {
-        color: $color-secondary;
+        color: $yellow;
     }
 }
 
@@ -204,14 +212,17 @@ a {
 }
 
 @media screen and (min-width: $view-large-devices) {
+
     h1,
     .title-primary {
         font-size: 4.1em;
     }
+
     h2,
     .title-secondary {
         font-size: 2.5em;
     }
+
     h3,
     .title-tertiary {
         font-size: 1.9em;

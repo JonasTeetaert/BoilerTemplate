@@ -9,6 +9,5 @@
 	<meta name="keywords" content="boiler template, template">
 	<meta name="author" content="Jonas Teetaert">
 	<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" type="text/css" href="css/css-bundles.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 </head>

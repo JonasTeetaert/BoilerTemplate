@@ -1,6 +1,6 @@
 // ========================================================
-// ON READY
+// ON DOM LOADED
 // ========================================================
-$(window).ready(function () {
-	console.log('jquery is working');
+document.addEventListener('DOMContentLoaded', () => {
+	console.log('hello earth people');
 });

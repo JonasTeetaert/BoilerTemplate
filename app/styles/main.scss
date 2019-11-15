@@ -1,0 +1,28 @@
+// * Patern Lab css structure
+
+// BASE
+@import './00_base/normalize';
+@import './00_base/global';
+@import './00_base/fonts';
+@import './00_base/mixins.scss';
+@import './00_base/elements';
+
+// ATOMS eg. a-button, a-icon
+@import './01_atom/**';
+
+// *MOLECULE eg. m-teaser
+@import './02_molecule/**';
+
+// ORGANISM eg. o-teaser-list
+@import './03_organism/**';
+
+// TEMPLATES eg. t-section
+// re-used on many web pages
+@import './04_template/**';
+
+// PAGES
+// pecific implementation of a template
+@import './05_page/**';
+
+// Overites everything
+@import './00_base/helpers';

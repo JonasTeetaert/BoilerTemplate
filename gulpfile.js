@@ -3,23 +3,24 @@
 // =============================================================================
 var $ = require('gulp-load-plugins')();
 var gulp = require('gulp');
-var gutil = require('gulp-util');
 var sass = require('gulp-sass');
+var sassGlob = require('gulp-sass-glob');
 var concat = require('gulp-concat');
 var notify = require('gulp-notify');
+var gutil = require('gulp-util');
 var cssnano = require('gulp-cssnano');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 var rimraf = require('rimraf');
-var sassdoc = require('sassdoc');
-var sassdir = require('require-dir');
 var browserSync = require('browser-sync');
 var sequence = require('run-sequence');
 var connect = require('gulp-connect-php');
-var babel = require("gulp-babel");
-var uglify = require("gulp-uglify");
-var rename = require('gulp-rename');
 var imagemin = require('gulp-imagemin');
+var uglify = require("gulp-uglify");
+var browserify = require('browserify');
+var babelify = require('babelify');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
 
 // =============================================================================
 // Server URL
@@ -45,7 +46,6 @@ var COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
 
 var srcPath = 'app';
 var buildPath = '_dist';
-var paths = require('./paths.json');
 
 
 // =============================================================================
@@ -72,12 +72,12 @@ gulp.task('php', function () {
 // =============================================================================
 gulp.task('compile-sass:local', function () {
     return gulp
-        .src([
-            paths.css.bootstrap,
-            srcPath + '/sass/main.scss'])
+        .src(srcPath + '/styles/main.scss')
         .pipe(sourcemaps.init())
         .pipe(concat('main.scss'))
-        .pipe(sass()).on('error', notify.onError(function (error) {
+        .pipe(sassGlob())
+        .pipe(sass())
+        .on('error', notify.onError(function (error) {
             return "Problem file : " + error.message;
         }))
         .pipe(autoprefixer())
@@ -86,25 +86,17 @@ gulp.task('compile-sass:local', function () {
         .pipe(gulp.dest(buildPath + '/css'));
 });
 
-// Whithout sourcemaps
+// Without sourcemaps and minified
 gulp.task('compile-sass:release', function () {
     return gulp
-        .src([
-            paths.css.bootstrap,
-            srcPath + '/sass/main.scss'])
+        .src(srcPath + '/styles/main.scss')
         .pipe(concat('main.scss'))
-        .pipe(sass()).on('error', notify.onError(function (error) {
+        .pipe(sassGlob())
+        .pipe(sass())
+        .on('error', notify.onError(function (error) {
             return "Problem file : " + error.message;
         }))
         .pipe(autoprefixer())
-        .pipe(cssnano())
-        .pipe(gulp.dest(buildPath + '/css'));
-});
-
-gulp.task('bundle-css', function () {
-    return gulp
-        .src(paths.css.bootstrap)
-        .pipe(concat('css-bundles.css'))
         .pipe(cssnano())
         .pipe(gulp.dest(buildPath + '/css'));
 });
@@ -113,49 +105,54 @@ gulp.task('bundle-css', function () {
 // Combine JavaScript into one file
 // In production, the file is minified
 // =============================================================================
-gulp.task('compile-js:local', function () {
-    return gulp
-        .src(srcPath + '/js/**/*.js')
-        .pipe(sourcemaps.init())
-        .pipe(babel())
-        .pipe(concat('main.js'))
-        .pipe(uglify())
-        .pipe(sourcemaps.write())
+gulp.task('bundle-js:local', function () {
+    return browserify({
+            entries: srcPath + '/js/index.js',
+            debug: true
+        })
+        .transform(babelify)
+        .bundle()
+        .on('error', function (err) {
+            gutil.log(err);
+            this.emit('end');
+        })
+        .pipe(source('bundle.js'))
+        .pipe(buffer())
+        .pipe(sourcemaps.init({
+            loadMaps: true
+        }))
+        .pipe(sourcemaps.write('./maps'))
         .pipe(gulp.dest(buildPath + '/js'));
 });
 
-// Without sourcemaps
-gulp.task('compile-js:release', function () {
-    return gulp
-        .src(srcPath + '/js/**/*.js')
-        .pipe(babel())
-        .pipe(concat('main.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(buildPath + '/js'));
-});
-
-gulp.task('bundle-js', function () {
-    return gulp
-        .src([
-            paths.js.jquery,
-            paths.js.popperjs,
-            paths.js.bootstrap])
-        .pipe(concat('js-bundles.js'))
+// without sourcemaps and minified
+gulp.task('bundle-js:release', function () {
+    return browserify({
+            entries: srcPath + '/js/index.js',
+            debug: true
+        })
+        .transform(babelify)
+        .bundle()
+        .pipe(source('bundle.js'))
+        .pipe(buffer())
         .pipe(uglify())
         .pipe(gulp.dest(buildPath + '/js'));
 });
 
 // =============================================================================
-// Copy images to the buildPath folder
+// Copy assets to the buildPath folder
+// =============================================================================
+gulp.task('copy-assets', function () {
+    return gulp
+        .src(srcPath + '/assets/**/*')
+        .pipe(gulp.dest(buildPath + '/assets'));
+});
+
+// =============================================================================
+// Copy and minifies images to the buildPath folder
 // In production, the images are compressed
 // =============================================================================
-gulp.task('copy-images:local', function () {
-    return gulp
-        .src(srcPath + '/assets/images/**/*')
-        .pipe(gulp.dest(buildPath + '/assets/images'));
-});
-
-gulp.task('copy-images:release', function () {
+gulp.task('minify-images', function () {
     return gulp
         .src(srcPath + '/assets/images/**/*')
         .pipe(imagemin())
@@ -163,61 +160,24 @@ gulp.task('copy-images:release', function () {
 });
 
 // =============================================================================
-// Copy src fonts to the buildPath folder
-// =============================================================================
-gulp.task('copy-fonts', function () {
-    return gulp
-        .src(srcPath + '/assets/fonts/**/*.*')
-        .pipe(gulp.dest(buildPath + '/assets/fonts'));
-});
-
-// =============================================================================
-// Copy icons fonts to the buildPath folder
-// =============================================================================
-gulp.task('copy-icons', function () {
-    return gulp
-        .src(srcPath + '/assets/icons/**/*.*')
-        .pipe(gulp.dest(buildPath + '/assets/icons'));
-});
-
-// =============================================================================
-// Copy src JSON to the buildPath folder
-// =============================================================================
-gulp.task('copy-json', function () {
-    return gulp
-        .src(srcPath + '/assets/json/**/*.json')
-        .pipe(gulp.dest(buildPath + '/assets/json'));
-});
-
-
-// =============================================================================
 // Build the buildPath folder by running all of the above tasks
 // =============================================================================
 gulp.task('build:local', function (done) {
     sequence('clean', [
         'php',
-        'bundle-css',
         'compile-sass:local',
-        'bundle-js',
-        'compile-js:local',
-        'copy-images:local',
-        'copy-fonts',
-        'copy-icons'
-        //'copy-json'
+        'bundle-js:local',
+        'copy-assets',
     ], done);
 });
 
 gulp.task('build:release', function (done) {
     sequence('clean', [
         'php',
-        'bundle-css',
         'compile-sass:release',
-        'bundle-js',
-        'compile-js:release',
-        'copy-images:release',
-        'copy-fonts',
-        'copy-icons'
-        //'copy-json'
+        'bundle-js:release',
+        'copy-assets',
+        'minify-images',
     ], done);
 });
 
@@ -236,32 +196,41 @@ gulp.task('build:release', function (done) {
 
 });*/
 
-gulp.task('connect-php', function () {
-    connect.server({
-        base: buildPath,
-        port: PORT,
-        keepalive: true
+// gulp.task('connect-php', function () {
+//     connect.server({
+//         base: buildPath,
+//         port: PORT,
+//         keepalive: true
+//     });
+// });
+
+// gulp.task('browser-sync', ['connect-php'], function () {
+//     browserSync.init({
+//         server: {
+//             baseDir: buildPath,
+//         },
+//         port: PORT,
+//         notify: true,
+//         online: true
+//     });
+// });
+
+gulp.task('connect-sync', function () {
+    connect.server({}, function () {
+        browserSync({
+            proxy: '127.0.0.1:8000',
+            startPath: "/" + buildPath + '/index.php',
+        });
     });
 });
 
-gulp.task('browser-sync', ['connect-php'], function () {
-    browserSync({
-        proxy: '127.0.0.1:' + PORT,
-        port: PORT,
-        open: true,
-        notify: true,
-        startPath: 'index.php'
-    });
-});
 
 // =============================================================================
 // Build the site, run the server, and watch for file changes
 // =============================================================================
-gulp.task('default', ['build:local', 'browser-sync'], function () {
+gulp.task('default', ['build:local', 'connect-sync'], function () {
     gulp.watch([srcPath + '/**/*.php'], ['php', browserSync.reload]);
-    gulp.watch([srcPath + '/sass/**/*.scss'], ['compile-sass:local', browserSync.reload]);
-    gulp.watch([srcPath + '/js/**/*.js'], ['compile-js:local', browserSync.reload]);
-    gulp.watch([srcPath + '/assets/fonts/**/*'], ['copy-fonts', browserSync.reload]);
-    gulp.watch([srcPath + '/assets/icons/**/*'], ['copy-icons', browserSync.reload]);
-    gulp.watch([srcPath + '/assets/images/**/*'], ['copy-images', browserSync.reload]);
+    gulp.watch([srcPath + '/styles/**/*.scss'], ['compile-sass:local', browserSync.reload]);
+    gulp.watch([srcPath + '/js/**/*.js'], ['bundle-js:local', browserSync.reload]);
+    gulp.watch([srcPath + '/assets/**/*'], ['copy-assets', browserSync.reload]);
 });
