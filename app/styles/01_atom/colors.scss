@@ -1,0 +1,32 @@
+.colors {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+
+  li {
+    width: 25%;
+    text-align: center;
+  }
+}
+
+.colorblock {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+}
+
+.dark-blue {
+  background-color: #06044d;
+}
+
+.red {
+  background-color: #e04246;
+}
+
+.light-gray {
+  background-color: #eeeeee;
+}
+
+.gray {
+  background-color: #b9c0ca;
+}
